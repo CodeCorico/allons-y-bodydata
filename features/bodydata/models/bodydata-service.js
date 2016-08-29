@@ -1,28 +1,16 @@
 module.exports = function() {
   'use strict';
 
-  var isNode = typeof module != 'undefined' && typeof module.exports != 'undefined';
-
-  DependencyInjection.service('$BodyDataService', [function() {
+  DependencyInjection.service('$BodyDataService', ['$AbstractService', function($AbstractService) {
 
     return new (function BodyDataService() {
 
+      $AbstractService.call(this);
+
       var _data = {},
-          _$body = isNode ? null : $('body');
+          _$body = this.isNode() ? null : $('body');
 
-      this.data = function(name, value) {
-        if (isNode) {
-          if (name) {
-            if (typeof value != 'undefined') {
-              _data[name] = value;
-            }
-
-            return _data[name];
-          }
-
-          return _data;
-        }
-
+      this.data = this.methodFrontBack(function(name, value) {
         if (name) {
           if (typeof value != 'undefined') {
             _$body.data(name, value);
@@ -32,7 +20,17 @@ module.exports = function() {
         }
 
         return _$body.data();
-      };
+      }, function(name, value) {
+        if (name) {
+          if (typeof value != 'undefined') {
+            _data[name] = value;
+          }
+
+          return _data[name];
+        }
+
+        return _data;
+      });
 
       this.inject = function(html) {
         var dataAttributes = [];
