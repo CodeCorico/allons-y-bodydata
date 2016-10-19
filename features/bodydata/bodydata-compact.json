@@ -1,5 +1,5 @@
 {
   "files": [
-    "public/bodydata/bodydata-service.js"
+    "./public/bodydata/bodydata-service.js"
   ]
 }
