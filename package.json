@@ -15,7 +15,6 @@
     "npm": ">=3.2"
   },
   "dependencies": {
-    "allons-y-express": "^1.0.0",
     "allons-y-models": "^1.0.0"
   }
 }
