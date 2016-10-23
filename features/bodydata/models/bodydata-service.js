@@ -20,23 +20,34 @@ module.exports = function() {
         }
 
         return _$body.data();
-      }, function(name, value) {
+      }, function(req, name, value) {
+        var id = req ? req.id : 'all';
+        _data[id] = _data[id] || {};
+
         if (name) {
           if (typeof value != 'undefined') {
-            _data[name] = value;
+            _data[id][name] = value;
           }
 
-          return _data[name];
+          return _data[id][name];
         }
 
-        return _data;
+        return _data[id];
       });
 
-      this.inject = function(html) {
-        var dataAttributes = [];
+      this.inject = function(req, html) {
+        var extend = require('extend'),
+            dataAttributes = [],
+            data = extend(true, {}, _data.all);
 
-        Object.keys(_data).forEach(function(name) {
-          dataAttributes.push('data-' + name + '=\'' + JSON.stringify(_data[name]).replace(/'/g, '\\\'') + '\'');
+        if (req && _data[req.id]) {
+          extend(true, data, _data[req.id]);
+
+          delete _data[req.id];
+        }
+
+        Object.keys(data).forEach(function(name) {
+          dataAttributes.push('data-' + name + '=\'' + JSON.stringify(data[name]).replace(/'/g, '\\\'') + '\'');
         });
 
         return html.replace(/(<body.*?>)/, function(text) {
